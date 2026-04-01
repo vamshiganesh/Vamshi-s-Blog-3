@@ -5,6 +5,8 @@ import FallDetectionPanel from "@/components/FallDetectionPanel";
 import RelativeEmailManager from "@/components/RelativeEmailManager";
 import SOSButton from "@/components/SOSButton";
 import CompanionChat from "@/components/CompanionChat";
+import LocationTracker from "@/components/LocationTracker";
+import LocationLog from "@/components/LocationLog";
 import { AlertTriangle, Bell, LogOut, MessageCircleHeart, Siren, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -257,6 +259,15 @@ const Dashboard = () => {
           </div>
           <div className="rounded-2xl border border-orange-300/40 bg-orange-100/15 p-5 shadow-xl backdrop-blur">
             <SOSButton onEmergencyStateChange={setIsSosEmergency} />
+          </div>
+        </section>
+
+        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 mb-6">
+          <div className="rounded-2xl border border-cyan-200/30 bg-slate-900/70 p-5 shadow-xl backdrop-blur">
+            <LocationTracker />
+          </div>
+          <div className="rounded-2xl border border-cyan-200/30 bg-slate-900/70 p-5 shadow-xl backdrop-blur">
+            <LocationLog />
           </div>
         </section>
 
