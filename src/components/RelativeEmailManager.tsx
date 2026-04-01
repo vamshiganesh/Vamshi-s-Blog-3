@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, Plus, X, Send, UserCircle } from "lucide-react";
 
@@ -9,7 +9,13 @@ interface Contact {
   relation: string;
 }
 
-const RelativeEmailManager = () => {
+interface RelativeEmailManagerProps {
+  onContactsChange?: (contacts: Array<{ name: string; relation: string }>) => void;
+}
+
+const CONTACTS_STORAGE_KEY = "guardianFamilyContacts";
+
+const RelativeEmailManager = ({ onContactsChange }: RelativeEmailManagerProps) => {
   const [contacts, setContacts] = useState<Contact[]>([
     { id: "1", name: "Pallab", chatId: "8507257605", relation: "Family" },
     { id: "2", name: "Vamshi", chatId: "6607547411", relation: "Family" },
@@ -19,6 +25,27 @@ const RelativeEmailManager = () => {
   const [newChatId, setNewChatId] = useState("");
   const [newRelation, setNewRelation] = useState("");
   const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(CONTACTS_STORAGE_KEY);
+    if (!saved) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(saved) as Contact[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setContacts(parsed);
+      }
+    } catch (error) {
+      console.error("Failed to parse saved family contacts", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(CONTACTS_STORAGE_KEY, JSON.stringify(contacts));
+    onContactsChange?.(contacts.map((contact) => ({ name: contact.name, relation: contact.relation })));
+  }, [contacts, onContactsChange]);
 
   const addContact = () => {
     if (!newName || !newChatId) return;
@@ -69,7 +96,7 @@ const RelativeEmailManager = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-heading font-bold text-foreground flex items-center gap-2">
+        <h2 className="text-xl font-heading font-bold text-slate-100 drop-shadow-sm flex items-center gap-2">
           <MessageCircle className="w-5 h-5 text-info" />
           Family Updates (Telegram)
         </h2>

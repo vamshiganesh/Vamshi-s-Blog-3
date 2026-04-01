@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, MicOff, Volume2 } from "lucide-react";
+import { MessageCircleHeart, Mic, MicOff } from "lucide-react";
 
 const GEMINI_API_KEY = "AIzaSyDv61fq1EDqyhuq7yAJqH2XsvnN2RXlD2k";
 // Notice: gemini-3.1-flash-live-preview may not exist on standard unwhitelisted v1alpha WS endpoints so we map identically to the live API model:
@@ -157,6 +157,12 @@ const VoiceAssistant = () => {
                 if (part.text) {
                   // Text transcription streaming
                   setResponse(prev => (prev === "Assistant is speaking..." || prev === "Listening...") ? part.text : prev + " " + part.text);
+                  setTranscript((prev) => {
+                    if (!prev.trim()) {
+                      return part.text;
+                    }
+                    return `${prev}\n${part.text}`;
+                  });
                 }
               }
             } else if (msg.serverContent?.interrupted) {
@@ -239,9 +245,10 @@ const VoiceAssistant = () => {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-heading font-bold text-foreground flex items-center gap-2">
-        <Volume2 className="w-5 h-5 text-voice" />
-        Live Voice Call
+        <MessageCircleHeart className="w-5 h-5 text-voice" />
+        Help & Chat
       </h2>
+      <p className="text-sm text-muted-foreground">Use one button to start a voice conversation. A live transcript appears below.</p>
 
       {errorStatus && (
         <div className="bg-destructive/10 text-destructive p-3 rounded-xl text-sm font-medium">
@@ -268,32 +275,37 @@ const VoiceAssistant = () => {
             exit={{ opacity: 0, height: 0 }}
             className="bg-secondary p-3 rounded-2xl rounded-tr-sm"
           >
-            <p className="text-sm text-muted-foreground">You said:</p>
-            <p className="text-base font-body text-foreground">{transcript}</p>
+            <p className="text-sm text-muted-foreground">Live transcript</p>
+            <pre className="whitespace-pre-wrap text-base font-body text-foreground">{transcript}</pre>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Mic button */}
       <div className="flex justify-center">
         <motion.button
           onClick={isListening ? stopListening : startListening}
           whileTap={{ scale: 0.9 }}
-          className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+          className={`inline-flex min-h-[60px] items-center gap-3 rounded-full px-6 py-4 text-base font-semibold transition-all ${
             isListening
-              ? "bg-voice animate-sos-pulse"
-              : "bg-voice hover:scale-105"
+              ? "bg-voice animate-sos-pulse text-voice-foreground"
+              : "bg-voice text-voice-foreground hover:scale-105"
           }`}
         >
           {isListening ? (
-            <MicOff className="w-8 h-8 text-voice-foreground" />
+            <>
+              <MicOff className="w-6 h-6" />
+              End talk
+            </>
           ) : (
-            <Mic className="w-8 h-8 text-voice-foreground" />
+            <>
+              <Mic className="w-6 h-6" />
+              Talk to me
+            </>
           )}
         </motion.button>
       </div>
       <p className="text-center text-sm text-muted-foreground">
-        {isListening ? "Listening... tap to hang up" : "Tap to call Assistant"}
+        {isListening ? "Listening now. Tap End talk to finish." : "Tap Talk to me to begin a guided voice session."}
       </p>
     </div>
   );

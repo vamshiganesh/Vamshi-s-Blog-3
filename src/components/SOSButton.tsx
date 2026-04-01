@@ -2,7 +2,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, X, AlertTriangle } from "lucide-react";
 
-const SOSButton = () => {
+interface SOSButtonProps {
+  onEmergencyStateChange?: (isEmergency: boolean) => void;
+}
+
+const SOSButton = ({ onEmergencyStateChange }: SOSButtonProps) => {
   const [isActive, setIsActive] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
 
@@ -10,9 +14,11 @@ const SOSButton = () => {
     if (isActive) {
       setIsActive(false);
       setCountdown(null);
+      onEmergencyStateChange?.(false);
       return;
     }
     setIsActive(true);
+    onEmergencyStateChange?.(true);
     let count = 5;
     setCountdown(count);
     const interval = setInterval(() => {
@@ -53,6 +59,7 @@ const SOSButton = () => {
         // Trigger UI alert
         alert("🚨 Emergency contacts have been notified via Telegram and Email!");
         setIsActive(false);
+        onEmergencyStateChange?.(false);
       } else {
         setCountdown(count);
       }
@@ -66,12 +73,13 @@ const SOSButton = () => {
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: "spring", stiffness: 200 }}
     >
+      <span className={`absolute inset-0 rounded-full ${isActive ? "animate-ping bg-red-400/30" : "bg-red-300/10"}`} />
       <button
         onClick={handleSOS}
-        className={`relative w-36 h-36 rounded-full flex items-center justify-center transition-all duration-300 ${
+        className={`relative h-40 w-40 rounded-full flex items-center justify-center transition-all duration-300 border border-white/30 shadow-[inset_8px_8px_18px_rgba(255,255,255,0.12),inset_-10px_-10px_18px_rgba(0,0,0,0.45),0_14px_32px_rgba(255,71,87,0.45)] backdrop-blur-md ${
           isActive
             ? "bg-sos animate-sos-pulse"
-            : "bg-sos hover:scale-105"
+            : "bg-gradient-to-br from-red-500 to-red-700 hover:scale-105"
         }`}
       >
         <AnimatePresence mode="wait">
@@ -104,7 +112,7 @@ const SOSButton = () => {
           )}
         </AnimatePresence>
       </button>
-      <p className="text-muted-foreground text-base font-body text-center max-w-[200px]">
+      <p className="text-base font-body text-center max-w-[220px]" style={{ color: "#E0E0E0" }}>
         {isActive ? "Tap again to cancel" : "Press & hold for emergency"}
       </p>
     </motion.div>

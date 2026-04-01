@@ -41,7 +41,7 @@ const ActivityMonitor = () => {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-xl font-heading font-bold text-foreground flex items-center gap-2">
+      <h2 className="text-xl font-heading font-bold text-slate-100 drop-shadow-sm flex items-center gap-2">
         <Clock className="w-5 h-5 text-warning" />
         Activity Monitor
       </h2>
